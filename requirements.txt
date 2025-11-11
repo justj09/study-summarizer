@@ -1,3 +1,5 @@
+fastapi==0.115.12
+python-multipart==0.0.20
 pydantic==2.10.2
 pydantic_settings==2.6.1
 langchain==0.3.25

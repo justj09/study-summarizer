@@ -10,6 +10,11 @@ class Settings(BaseSettings):
     google_account_file: str
     openai_key: str
     gpt_model: str
+    
+    api_key: str
+    temp_folder: str = "./temp"
+    max_file_size_mb: int = 10
+    max_page_count: int = 50
 
     @computed_field
     @property

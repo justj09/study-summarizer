@@ -1,8 +1,8 @@
 from io import BytesIO
+from pathlib import Path
 from google.cloud import vision
 from google.oauth2 import service_account
 from PIL.Image import Image
-from langchain_community.document_loaders.parsers.pdf import PyMuPDFParser
 from langchain_community.document_loaders.parsers.images import BaseImageBlobParser
 from langchain_community.document_loaders.pdf import PyMuPDFLoader
 from config import settings
@@ -36,10 +36,24 @@ class GoogleOCRImageBlobParser(BaseImageBlobParser):
 
 
 class CustomPDFLoader(PyMuPDFLoader):
-    """Load and parse a PDF file comprehensively."""
+    """Loader for PDF files with images and tables."""
 
     def __init__(self, file_path, **kwargs):
         kwargs.setdefault("extract_images", True)
         kwargs.setdefault("images_parser", GoogleOCRImageBlobParser())
         kwargs.setdefault("extract_tables", "csv")
         super().__init__(file_path, **kwargs)
+
+
+def load_pdf_content(file_path: str | Path, start_page: int, end_page: int) -> str:
+    """Load a PDF file and retrieve the text content within the page range."""
+
+    loader = CustomPDFLoader(file_path)
+    content = ""
+    for i, page in enumerate(loader.lazy_load(), start=1):
+        if i < start_page:
+            continue
+        if i > end_page:
+            break
+        content += page.page_content + "\n\n"
+    return content
