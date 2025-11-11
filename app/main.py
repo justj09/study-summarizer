@@ -40,8 +40,8 @@ async def analyze(
             file_bytes = await file.read() 
             f.write(file_bytes)
         
-        content = load_pdf_content(temp_file, start_page, end_page)
-        analysis = analyze_content(content)
+        content = await load_pdf_content(temp_file, start_page, end_page)
+        analysis = await analyze_content(content)
         temp_file.unlink(missing_ok=True)
 
         return {"summary": analysis.summary, "description": analysis.description}

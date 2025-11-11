@@ -8,3 +8,4 @@ langchain-openai==0.3.22
 pymupdf==1.26.1
 pillow==11.3.0
 google-cloud-vision==3.10.2
+asyncio==4.0.0

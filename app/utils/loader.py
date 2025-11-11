@@ -1,3 +1,4 @@
+import asyncio
 from io import BytesIO
 from pathlib import Path
 from google.cloud import vision
@@ -45,15 +46,19 @@ class CustomPDFLoader(PyMuPDFLoader):
         super().__init__(file_path, **kwargs)
 
 
-def load_pdf_content(file_path: str | Path, start_page: int, end_page: int) -> str:
+async def load_pdf_content(file_path: str | Path, start_page: int, end_page: int) -> str:
     """Load a PDF file and retrieve the text content within the page range."""
 
     loader = CustomPDFLoader(file_path)
     content = ""
-    for i, page in enumerate(loader.lazy_load(), start=1):
-        if i < start_page:
-            continue
-        if i > end_page:
-            break
-        content += page.page_content + "\n\n"
+    
+    def blocking_load():
+        pages = []
+        for i, page in enumerate(loader.lazy_load(), start=1):
+            if start_page <= i <= end_page:
+                pages.append(page.page_content)
+        return pages
+
+    pages = await asyncio.to_thread(blocking_load)
+    content = "\n\n".join(pages)
     return content
